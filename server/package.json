@@ -1,0 +1,17 @@
+{
+  "name": "boogiboogie-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "부기부기 백엔드 — Express + SQLite (해커톤 데모용, 단일 사용자)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,1727 @@
+<meta charset="UTF-8">
+<title>부기부기 — 디자인 목업 (visily 반영)</title>
+<style>
+  :root {
+    --bg: #F5F5F7;
+    --surface: #FFFFFF;
+    --surface-2: #F2F2F7;
+    --text: #1D1D1F;
+    --text-2: #6E6E73;
+    --divider: #D2D2D7;
+    --accent: #007AFF;
+    --accent-soft: #E8F1FE;
+    --toggle-on: #34C759;
+    --shadow: 0 20px 45px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000;
+      --surface: #1C1C1E;
+      --surface-2: #2C2C2E;
+      --text: #F5F5F7;
+      --text-2: #98989D;
+      --divider: #38383A;
+      --accent: #0A84FF;
+      --accent-soft: #123252;
+      --toggle-on: #30D158;
+      --shadow: 0 20px 45px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #000000; --surface: #1C1C1E; --surface-2: #2C2C2E;
+    --text: #F5F5F7; --text-2: #98989D; --divider: #38383A;
+    --accent: #0A84FF; --accent-soft: #123252; --toggle-on: #30D158;
+    --shadow: 0 20px 45px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.4);
+  }
+  :root[data-theme="light"] {
+    --bg: #F5F5F7; --surface: #FFFFFF; --surface-2: #F2F2F7;
+    --text: #1D1D1F; --text-2: #6E6E73; --divider: #D2D2D7;
+    --accent: #007AFF; --accent-soft: #E8F1FE; --toggle-on: #34C759;
+    --shadow: 0 20px 45px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body { min-height: 100vh; }
+
+  .stage {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .stage-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .stage-header p {
+    font-size: 15px;
+    color: var(--text-2);
+    margin: 0;
+    max-width: 46ch;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .switcher {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 28px 0 40px;
+  }
+  .switcher button {
+    appearance: none;
+    border: 1px solid var(--divider);
+    background: var(--surface);
+    color: var(--text);
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .switcher button:hover { border-color: var(--accent); }
+  .switcher button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .switcher button[aria-selected="true"] {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(300px, 340px) 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; justify-items: center; }
+  }
+
+  /* ---- Phone frame ---- */
+  .phone-wrap { display: flex; justify-content: center; }
+  .phone {
+    position: relative;
+    width: 320px;
+    height: 690px;
+    background: var(--surface);
+    border-radius: 46px;
+    box-shadow: var(--shadow);
+    border: 6px solid var(--text);
+    overflow: hidden;
+    --fs-scale: 1;
+  }
+  .phone { border-color: #2b2b2d; }
+  .island {
+    position: absolute;
+    top: 10px; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 26px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 20;
+  }
+  .home-indicator {
+    position: absolute;
+    bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 5px;
+    background: var(--text);
+    opacity: 0.25;
+    border-radius: 4px;
+    z-index: 20;
+  }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    padding: 46px 18px 30px;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .screen.active { display: flex; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* ---- shared UI atoms ---- */
+  .h-display {
+    font-size: calc(24px * var(--fs-scale));
+    font-weight: 700;
+    line-height: 1.25;
+    text-wrap: balance;
+    margin: 0 0 10px;
+  }
+  .h-sub {
+    font-size: calc(15px * var(--fs-scale));
+    color: var(--text-2);
+    line-height: 1.5;
+    margin: 0 0 20px;
+  }
+  .card {
+    background: var(--surface-2);
+    border-radius: 20px;
+    padding: 16px;
+  }
+  .btn-primary {
+    appearance: none;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-family: inherit;
+    font-size: calc(16px * var(--fs-scale));
+    font-weight: 600;
+    padding: 15px;
+    border-radius: 16px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .btn-primary:focus-visible { outline: 3px solid var(--accent-soft); outline-offset: 2px; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .segmented {
+    display: flex;
+    gap: 8px;
+  }
+  .segmented button {
+    flex: 1;
+    appearance: none;
+    border: 1.5px solid var(--divider);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: calc(16px * var(--fs-scale));
+    font-weight: 600;
+    padding: 16px 8px;
+    border-radius: 16px;
+    cursor: pointer;
+  }
+  .segmented button.on {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin: 6px 0 4px;
+  }
+  .stepper button {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid var(--divider);
+    background: var(--surface);
+    color: var(--accent);
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .stepper .age-value {
+    font-size: calc(30px * var(--fs-scale));
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    min-width: 64px;
+    text-align: center;
+  }
+  .field-label {
+    font-size: calc(13px * var(--fs-scale));
+    color: var(--text-2);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 18px 0 8px;
+  }
+
+  /* onboarding */
+  #screen-onboarding { justify-content: center; }
+  .onboard-body { margin-top: 4px; }
+
+  /* tutorial */
+  #screen-tutorial { justify-content: space-between; text-align: center; }
+  .tut-skip {
+    align-self: flex-end;
+    background: none; border: none;
+    color: var(--text-2);
+    font-family: inherit;
+    font-size: calc(14px * var(--fs-scale));
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .tut-illustration {
+    width: 140px; height: 140px;
+    margin: 10px auto 22px;
+    border-radius: 32px;
+    background: linear-gradient(160deg, var(--accent-soft), var(--surface-2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 56px;
+  }
+  .dots { display: flex; justify-content: center; gap: 6px; margin: 18px 0; }
+  .dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--divider); }
+  .dots span.on { background: var(--accent); width: 18px; border-radius: 4px; }
+
+  /* home */
+  .home-titlebar {
+    text-align: center;
+    font-size: calc(15px * var(--fs-scale));
+    font-weight: 700;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .home-profile { text-align: center; margin-bottom: 20px; }
+  .avatar-big {
+    position: relative;
+    appearance: none; border: none; padding: 0;
+    width: 72px; height: 72px; border-radius: 22px;
+    background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; color: var(--accent);
+    cursor: pointer; flex-shrink: 0;
+    margin: 0 auto 12px;
+  }
+  .avatar-big.set { background: linear-gradient(160deg, #FFD98A, #FF9F6B); color: #fff; }
+  .avatar-badge {
+    position: absolute; right: -4px; bottom: -4px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-size: 12px; display: flex; align-items: center; justify-content: center;
+    border: 2.5px solid var(--surface);
+  }
+  .home-greeting { font-size: calc(18px * var(--fs-scale)); font-weight: 700; margin: 0 0 4px; }
+  .home-greeting strong { color: var(--accent); }
+  .home-meta { font-size: calc(13.5px * var(--fs-scale)); color: var(--text-2); margin: 0; font-variant-numeric: tabular-nums; }
+
+  .home-cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .home-card {
+    appearance: none; border: none; background: var(--surface-2);
+    border-radius: 20px; padding: 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: inherit; color: var(--text); cursor: pointer;
+    transition: transform 0.1s ease;
+    width: 100%; text-align: left;
+  }
+  .home-card:hover { transform: translateY(-2px); }
+  .home-card.primary { background: var(--accent); color: #fff; }
+  .hc-title { font-size: calc(16.5px * var(--fs-scale)); font-weight: 700; margin-bottom: 4px; }
+  .hc-sub { font-size: calc(12.5px * var(--fs-scale)); line-height: 1.4; opacity: 0.75; }
+  .home-card:not(.primary) .hc-sub { color: var(--text-2); opacity: 1; }
+  .hc-icon {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px; background: rgba(255,255,255,0.25);
+  }
+  .home-card:not(.primary) .hc-icon { background: var(--surface); }
+
+  .home-divider { border: none; border-top: 1px solid var(--divider); margin: 18px 0 14px; }
+  .help-title { font-size: calc(14px * var(--fs-scale)); font-weight: 700; margin: 0 0 10px; }
+  .help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .help-card {
+    appearance: none; border: none; background: var(--surface-2);
+    border-radius: 16px; padding: 16px 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    font-family: inherit; color: var(--text); cursor: pointer;
+  }
+  .help-card .emoji { font-size: 20px; }
+  .help-card .label { font-size: calc(13px * var(--fs-scale)); font-weight: 600; }
+
+  .cat-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .cat-card {
+    appearance: none;
+    border: none;
+    background: var(--surface-2);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex; align-items: center; gap: 14px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+    width: 100%;
+    transition: transform 0.1s ease;
+  }
+  .cat-card:hover { transform: translateY(-2px); }
+  .cat-card .body { flex: 1; }
+  .cat-badge {
+    display: inline-block; font-size: calc(10.5px * var(--fs-scale)); font-weight: 700;
+    background: var(--accent); color: #fff; padding: 3px 9px; border-radius: 999px;
+    margin-bottom: 6px;
+  }
+  .cat-card .label { font-size: calc(15px * var(--fs-scale)); font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
+  .cat-desc { font-size: calc(12px * var(--fs-scale)); color: var(--text-2); line-height: 1.4; margin-bottom: 8px; }
+  .cat-link { font-size: calc(12.5px * var(--fs-scale)); font-weight: 700; color: var(--accent); }
+  .cat-thumb {
+    font-size: 26px; width: 56px; height: 56px; border-radius: 14px;
+    background: var(--surface); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .help-callout {
+    display: flex; gap: 10px;
+    background: var(--accent-soft); border-radius: 16px; padding: 14px;
+    font-size: calc(12.5px * var(--fs-scale)); line-height: 1.5; color: var(--text);
+    margin-top: 4px;
+  }
+  .help-callout .ic { font-size: 16px; flex-shrink: 0; }
+  .help-callout strong { color: var(--accent); }
+
+  .data-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent-soft);
+    border-radius: 16px;
+    padding: 12px 14px;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .data-banner .ic { font-size: 20px; }
+  .data-banner .txt { flex: 1; }
+  .data-banner .txt .t1 { font-size: calc(11.5px * var(--fs-scale)); font-weight: 700; color: var(--accent); }
+  .data-banner .txt .t2 { font-size: calc(13.5px * var(--fs-scale)); font-weight: 600; color: var(--text); margin-top: 2px; line-height: 1.3; }
+  .data-banner .chev { color: var(--accent); font-size: 15px; }
+
+  /* text input (onboarding name field) */
+  .text-input {
+    width: 100%;
+    appearance: none;
+    border: 1.5px solid var(--divider);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: calc(15px * var(--fs-scale));
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+  .text-input::placeholder { color: var(--text-2); }
+  .text-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* apply (AI 신청 도우미) */
+  .apply-form { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .chat-bubble {
+    max-width: 84%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: calc(13.5px * var(--fs-scale));
+    line-height: 1.5;
+  }
+  .chat-bubble.bot { background: var(--surface-2); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .chat-bubble.user { background: var(--accent); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .apply-progress { font-size: calc(12px * var(--fs-scale)); color: var(--text-2); text-align: center; margin: 4px 0 14px; }
+  .apply-done { display: none; flex: 1; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .apply-done.active { display: flex; }
+  .apply-done .check {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(52,199,89,0.15); color: var(--toggle-on);
+    font-size: 30px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  /* history */
+  .history-card { margin-bottom: 10px; }
+  .history-card .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .history-card .title { font-size: calc(14.5px * var(--fs-scale)); font-weight: 700; }
+  .status-pill {
+    font-size: calc(11.5px * var(--fs-scale)); font-weight: 700;
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .status-pill.wait { background: var(--accent-soft); color: var(--accent); }
+  .status-pill.selected { background: rgba(52,199,89,0.15); color: var(--toggle-on); }
+  .history-card .meta { font-size: calc(12px * var(--fs-scale)); color: var(--text-2); }
+
+  /* category list */
+  .list-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .back-btn {
+    appearance: none; border: none; background: var(--surface-2);
+    width: 32px; height: 32px; border-radius: 50%;
+    color: var(--accent); font-size: 16px; cursor: pointer;
+  }
+  .list-header h2 { font-size: calc(18px * var(--fs-scale)); margin: 0; font-weight: 700; }
+  .job-card { margin-bottom: 10px; cursor: pointer; }
+  .job-card .org { font-size: calc(12.5px * var(--fs-scale)); color: var(--text-2); font-weight: 600; margin-bottom: 4px; }
+  .job-card .title { font-size: calc(15.5px * var(--fs-scale)); font-weight: 700; margin-bottom: 6px; }
+  .job-card .meta { font-size: calc(12.5px * var(--fs-scale)); color: var(--text-2); line-height: 1.6; margin-bottom: 10px; }
+  .job-card .apply {
+    appearance: none; border: none; background: var(--accent); color: #fff;
+    font-family: inherit; font-weight: 600; font-size: calc(13.5px * var(--fs-scale));
+    padding: 9px 14px; border-radius: 12px; cursor: pointer;
+    display: block; text-align: center; text-decoration: none;
+  }
+  .job-search { display: flex; gap: 8px; margin-bottom: 12px; }
+  .job-search .text-input { flex: 1; padding: 11px 14px; font-size: calc(13.5px * var(--fs-scale)); }
+  .job-search .grid-btn {
+    appearance: none; border: 1.5px solid var(--divider); background: var(--surface);
+    width: 42px; border-radius: 12px; color: var(--text-2); font-size: 15px; cursor: pointer; flex-shrink: 0;
+  }
+  .job-count { font-size: calc(12.5px * var(--fs-scale)); color: var(--text-2); margin: 0 0 12px; }
+  .job-search .grid-btn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  #jobCardList.grid-view { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #jobCardList.grid-view .job-card { margin-bottom: 0; padding: 12px; }
+  #jobCardList.grid-view .job-card .title { font-size: calc(13px * var(--fs-scale)); }
+  #jobCardList.grid-view .job-card .meta { display: none; }
+  #jobCardList.grid-view .job-card .apply { font-size: calc(11.5px * var(--fs-scale)); padding: 7px 10px; }
+  .info-callout {
+    display: flex; gap: 10px;
+    background: var(--accent-soft); border-radius: 16px; padding: 13px 14px;
+    font-size: calc(12.5px * var(--fs-scale)); line-height: 1.5; color: var(--text);
+    margin-bottom: 14px;
+  }
+  .info-callout .ic { font-size: 16px; flex-shrink: 0; }
+
+  /* job detail */
+  .jd-hero {
+    position: relative; height: 150px; border-radius: 18px; overflow: hidden;
+    margin-bottom: 14px; display: flex; align-items: flex-end;
+    background: linear-gradient(160deg, #5b6472, #2c313a);
+  }
+  .jd-hero .overlay {
+    position: relative; z-index: 1; padding: 14px; color: #fff;
+  }
+  .jd-hero .cat-tag {
+    display: inline-block; font-size: calc(11px * var(--fs-scale)); font-weight: 700;
+    background: rgba(255,255,255,0.25); padding: 3px 9px; border-radius: 999px; margin-bottom: 6px;
+  }
+  .jd-hero .jd-title { font-size: calc(18px * var(--fs-scale)); font-weight: 700; }
+  .jd-org-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .jd-org-row .org-name { font-size: calc(13.5px * var(--fs-scale)); font-weight: 700; }
+  .jd-status { font-size: calc(12px * var(--fs-scale)); color: var(--toggle-on); font-weight: 700; margin-top: 2px; }
+  .jd-contact-btn {
+    appearance: none; border: 1.5px solid var(--divider); background: var(--surface);
+    color: var(--accent); font-family: inherit; font-weight: 700; font-size: calc(12.5px * var(--fs-scale));
+    padding: 8px 12px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  }
+  .jd-info-row { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--divider); }
+  .jd-info-row:last-of-type { border-bottom: none; }
+  .jd-info-row .ic { font-size: 17px; width: 22px; flex-shrink: 0; }
+  .jd-info-row .k { font-size: calc(12px * var(--fs-scale)); color: var(--text-2); margin-bottom: 3px; }
+  .jd-info-row .v { font-size: calc(14.5px * var(--fs-scale)); font-weight: 700; }
+  .jd-info-row .sub { font-size: calc(12px * var(--fs-scale)); color: var(--text-2); margin-top: 2px; }
+  .jd-eligibility { margin-top: 14px; }
+  .jd-eligibility ul { margin: 0; padding-left: 18px; }
+  .jd-eligibility li { font-size: calc(13px * var(--fs-scale)); line-height: 1.8; }
+  .jd-notice {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--accent-soft); border-radius: 14px; padding: 12px 14px;
+    margin: 14px 0; cursor: pointer; border: none; width: 100%; text-align: left; font-family: inherit;
+  }
+  .jd-notice .txt { flex: 1; font-size: calc(12.5px * var(--fs-scale)); }
+  .jd-notice .txt strong { display: block; color: var(--accent); margin-bottom: 1px; }
+  .jd-notice .chev { color: var(--accent); }
+
+  /* customer center */
+  .cc-hero { text-align: center; margin-bottom: 18px; }
+  .cc-hero .ic { font-size: 40px; margin-bottom: 8px; }
+  .cc-hero .t { font-size: calc(13px * var(--fs-scale)); color: var(--text-2); }
+  .cc-call-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--accent); color: #fff; text-decoration: none;
+    font-weight: 700; font-size: calc(16px * var(--fs-scale));
+    padding: 15px; border-radius: 16px; margin-bottom: 14px;
+  }
+  .cc-hours-card { display: flex; flex-direction: column; gap: 2px; }
+  .cc-hours-card .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: calc(13.5px * var(--fs-scale)); }
+  .cc-hours-card .row .k { color: var(--text-2); }
+  .cc-hours-card .row .v { font-weight: 600; }
+
+  /* legal doc screens (privacy / terms) */
+  .doc-text { font-size: calc(13px * var(--fs-scale)); line-height: 1.8; color: var(--text-2); }
+  .doc-text h3 { font-size: calc(14px * var(--fs-scale)); color: var(--text); margin: 18px 0 6px; }
+  .doc-text h3:first-child { margin-top: 0; }
+
+  /* settings */
+  .settings-group { margin-bottom: 18px; }
+  .settings-group .g-title {
+    font-size: calc(12px * var(--fs-scale));
+    color: var(--text-2); font-weight: 700;
+    letter-spacing: 0.03em; text-transform: uppercase;
+    margin: 0 0 8px 4px;
+  }
+  .settings-list { background: var(--surface-2); border-radius: 16px; overflow: hidden; }
+  .s-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .s-row:last-child { border-bottom: none; }
+  .s-row .ic { font-size: 17px; width: 22px; text-align: center; }
+  .s-row .label { flex: 1; font-size: calc(14.5px * var(--fs-scale)); font-weight: 500; }
+  .s-row .value { font-size: calc(13.5px * var(--fs-scale)); color: var(--text-2); }
+  .toggle {
+    width: 46px; height: 27px; border-radius: 14px;
+    background: var(--divider); position: relative; cursor: pointer;
+    border: none; flex-shrink: 0; transition: background 0.15s ease;
+  }
+  .toggle::after {
+    content: ""; position: absolute; top: 2px; left: 2px;
+    width: 23px; height: 23px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: transform 0.15s ease;
+  }
+  .toggle.on { background: var(--toggle-on); }
+  .toggle.on::after { transform: translateX(19px); }
+  .fs-segmented { display: flex; gap: 6px; }
+  .fs-segmented button {
+    appearance: none; border: 1.5px solid var(--divider); background: var(--surface);
+    color: var(--text); font-family: inherit; font-size: 12.5px; font-weight: 600;
+    padding: 6px 10px; border-radius: 10px; cursor: pointer;
+  }
+  .fs-segmented button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .map-preview {
+    margin-top: 10px; height: 120px; border-radius: 16px; overflow: hidden;
+    position: relative;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(90,200,250,0.35), transparent 45%),
+      radial-gradient(circle at 70% 70%, rgba(52,199,89,0.3), transparent 45%),
+      var(--surface-2);
+    display: none;
+  }
+  .map-preview.on { display: block; }
+  .map-pin {
+    position: absolute; width: 14px; height: 14px; border-radius: 50% 50% 50% 0;
+    background: var(--accent); transform: rotate(-45deg);
+    box-shadow: 0 0 0 3px var(--surface);
+  }
+  .map-pin-label {
+    position: absolute;
+    font-size: 10px; font-weight: 700; color: var(--accent);
+    background: var(--surface); padding: 2px 6px; border-radius: 6px;
+    white-space: nowrap;
+  }
+  .map-toggle-btn {
+    appearance: none; border: none; background: var(--surface-2);
+    color: var(--accent); font-family: inherit; font-weight: 600;
+    font-size: calc(13px * var(--fs-scale));
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 14px; border-radius: 14px; cursor: pointer;
+    margin-bottom: 12px; width: 100%;
+  }
+  .map-toggle-btn.on { background: var(--accent-soft); }
+
+  /* data screen (공공데이터 확인하기) */
+  .data-section-title {
+    font-size: calc(11.5px * var(--fs-scale)); font-weight: 700;
+    color: var(--text-2); text-transform: uppercase; letter-spacing: 0.04em;
+    margin: 20px 0 10px;
+  }
+  .data-section-title:first-child { margin-top: 0; }
+  .stat-tile-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .stat-tile {
+    background: var(--surface-2); border-radius: 14px;
+    padding: 12px 8px; text-align: center;
+  }
+  .stat-tile .v {
+    font-size: calc(17px * var(--fs-scale)); font-weight: 700; color: var(--accent);
+    font-variant-numeric: tabular-nums; display: block; margin-bottom: 2px;
+  }
+  .stat-tile .l {
+    font-size: calc(10.5px * var(--fs-scale)); color: var(--text-2); line-height: 1.3;
+  }
+  .bar-chart { background: var(--surface-2); border-radius: 16px; padding: 14px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-radius: 8px; }
+  .bar-row:hover { background: rgba(0,0,0,0.03); }
+  .bar-row .b-label {
+    width: 40px; flex-shrink: 0; font-size: calc(11.5px * var(--fs-scale));
+    color: var(--text-2); font-weight: 600;
+  }
+  .bar-row.highlight .b-label { color: var(--accent); font-weight: 700; }
+  .bar-track { flex: 1; height: 14px; background: var(--divider); border-radius: 4px; position: relative; overflow: hidden; }
+  .bar-fill { position: absolute; inset: 0 auto 0 0; background: var(--text-2); border-radius: 4px; }
+  .bar-row.highlight .bar-fill { background: var(--accent); }
+  .bar-row .b-value {
+    width: 42px; flex-shrink: 0; text-align: right;
+    font-size: calc(11px * var(--fs-scale)); color: var(--text-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .bar-row.highlight .b-value { color: var(--accent); font-weight: 700; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    font-size: calc(10.5px * var(--fs-scale)); color: var(--text-2); text-align: left;
+    font-weight: 600; padding: 0 0 6px; border-bottom: 1px solid var(--divider);
+  }
+  .data-table th:last-child, .data-table td:last-child { text-align: right; }
+  .data-table td {
+    font-size: calc(12.5px * var(--fs-scale)); padding: 7px 0;
+    border-bottom: 1px solid var(--divider);
+    font-variant-numeric: tabular-nums;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .source-list { margin: 0; padding-left: 16px; }
+  .source-list li { font-size: calc(10.5px * var(--fs-scale)); color: var(--text-2); line-height: 1.7; }
+
+  /* notes panel */
+  .notes {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 20px;
+    padding: 22px 24px;
+  }
+  .notes h2 { font-size: 15px; margin: 0 0 4px; }
+  .notes .sub { font-size: 12.5px; color: var(--text-2); margin: 0 0 16px; }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .notes li { font-size: 13.5px; line-height: 1.75; margin-bottom: 8px; }
+  .notes .note-block { display: none; }
+  .note-block.active { display: block; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    background: var(--accent-soft); color: var(--accent);
+    padding: 2px 8px; border-radius: 6px; margin-bottom: 10px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="stage">
+  <div class="stage-header">
+    <p class="eyebrow">부기부기 · Design Draft v1</p>
+    <h1>노인일자리 신청 접근성 앱, 부기부기</h1>
+    <p>Apple 스타일 톤으로 잡은 1차 화면 목업입니다. 위 탭으로 화면을 전환하며 확인하세요.</p>
+  </div>
+
+  <div class="switcher" role="tablist" aria-label="화면 전환">
+    <button role="tab" aria-selected="true" data-target="onboarding">① 첫 접속</button>
+    <button role="tab" aria-selected="false" data-target="tutorial">② 튜토리얼</button>
+    <button role="tab" aria-selected="false" data-target="home">③ 홈</button>
+    <button role="tab" aria-selected="false" data-target="categories">④ 카테고리</button>
+    <button role="tab" aria-selected="false" data-target="joblist">⑤ 일자리 목록</button>
+    <button role="tab" aria-selected="false" data-target="jobdetail">⑤b 일자리 상세</button>
+    <button role="tab" aria-selected="false" data-target="apply">⑥ AI 신청 도우미(예정)</button>
+    <button role="tab" aria-selected="false" data-target="history">⑦ 신청 이력</button>
+    <button role="tab" aria-selected="false" data-target="settings">⑧ 설정</button>
+    <button role="tab" aria-selected="false" data-target="data">⑨ 공공데이터</button>
+  </div>
+
+  <div class="layout">
+    <div class="phone-wrap">
+      <div class="phone" id="phone">
+        <div class="island"></div>
+
+        <!-- 1. Onboarding -->
+        <div class="screen active" id="screen-onboarding">
+          <div class="onboard-body">
+            <p class="h-display">안녕하세요!<br>몇 가지만 알려주세요</p>
+            <p class="h-sub">입력하신 정보는 일자리 안내에만 사용돼요.</p>
+
+            <p class="field-label">👤 성함이 어떻게 되시나요?</p>
+            <input class="text-input" id="nameInput" type="text" placeholder="이름을 입력해 주세요">
+
+            <p class="field-label">⚥ 성별을 선택해 주세요</p>
+            <div class="segmented">
+              <button class="on" type="button">여성</button>
+              <button type="button">남성</button>
+            </div>
+
+            <p class="field-label">📅 연세는 어떻게 되시나요?</p>
+            <div class="stepper">
+              <button type="button" aria-label="나이 감소">–</button>
+              <span class="age-value">70</span>
+              <button type="button" aria-label="나이 증가">+</button>
+            </div>
+          </div>
+          <button class="btn-primary" id="onboardNextBtn" type="button" style="margin-top:22px;" disabled>다음 단계로 이동 →</button>
+          <p class="h-sub" style="text-align:center; margin:10px 0 0;">나중에 설정에서 언제든지 바꿀 수 있어요</p>
+        </div>
+
+        <!-- 2. Tutorial -->
+        <div class="screen" id="screen-tutorial">
+          <button class="tut-skip" id="tutSkipBtn" type="button">건너뛰기</button>
+          <div>
+            <div class="tut-illustration">🙋</div>
+            <p class="h-display">"일자리 구하러 가기"를 누르면<br>딱 맞는 활동을 볼 수 있어요</p>
+            <p class="h-sub">신청 버튼을 누르면<br>AI가 신청서 작성을 도와드려요.</p>
+            <div class="dots"><span class="on"></span><span></span><span></span></div>
+          </div>
+          <button class="btn-primary" id="tutNextBtn" type="button">다음</button>
+        </div>
+
+        <!-- 3. Home -->
+        <div class="screen" id="screen-home" style="padding-bottom: 14px;">
+          <div class="home-titlebar">부기부기</div>
+
+          <div class="home-profile">
+            <button class="avatar-big" id="avatarBtn" type="button" aria-label="프로필 사진 설정">
+              <span id="avatarEmoji">👤</span>
+              <span class="avatar-badge">📷</span>
+            </button>
+            <p class="home-greeting">안녕하세요, <strong id="homeName">김정순</strong>님</p>
+            <p class="home-meta" id="homeMeta">72세 · 여</p>
+          </div>
+
+          <div class="home-cards">
+            <button class="home-card primary" type="button" data-goto="categories">
+              <div>
+                <div class="hc-title">일자리 구하기</div>
+                <div class="hc-sub">나에게 필요한<br>일자리를 찾아보세요</div>
+              </div>
+              <span class="hc-icon">🔍</span>
+            </button>
+            <button class="home-card" type="button" data-goto="history">
+              <div>
+                <div class="hc-title">신청 이력</div>
+                <div class="hc-sub">내가 신청한 일자리를<br>확인해요</div>
+              </div>
+              <span class="hc-icon">🕐</span>
+            </button>
+          </div>
+
+          <button class="data-banner" type="button" data-goto="data">
+            <span class="ic">📡</span>
+            <span class="txt">
+              <span class="t1">실시간 공공데이터 기반</span>
+              <span class="t2">안산시 노인일자리 현황 확인하기</span>
+            </span>
+            <span class="chev">›</span>
+          </button>
+
+          <hr class="home-divider">
+
+          <p class="help-title">도움이 필요하신가요?</p>
+          <div class="help-grid">
+            <button class="help-card" type="button" data-goto="settings">
+              <span class="emoji">⚙️</span>
+              <span class="label">설정 변경</span>
+            </button>
+            <button class="help-card" type="button" data-goto="customercenter">
+              <span class="emoji">💼</span>
+              <span class="label">고객 센터</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Categories -->
+        <div class="screen" id="screen-categories">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="home">‹</button>
+            <h2>일자리 종류 선택</h2>
+          </div>
+
+          <p class="h-display" style="font-size:calc(19px * var(--fs-scale));">어떤 종류의 일자리를<br>찾고 계신가요?</p>
+          <p class="h-sub" style="margin-bottom:16px;">희망하시는 일자리 유형을 선택하시면<br>딱 맞는 목록을 보여드려요.</p>
+
+          <div class="cat-grid">
+            <button class="cat-card" type="button" data-cat="publicgood">
+              <div class="body">
+                <span class="cat-badge">가장 인기</span>
+                <div class="label">공익활동형</div>
+                <div class="cat-desc">학교, 주민센터와 같은 공공 시설에서의 일자리</div>
+                <div class="cat-link">자세히 보기 →</div>
+              </div>
+              <span class="cat-thumb">🧹</span>
+            </button>
+            <button class="cat-card" type="button" data-cat="social">
+              <div class="body">
+                <div class="label">사회서비스형</div>
+                <div class="cat-desc">노인·장애인 시설 등에서 사회적 도움이 필요한 곳의 일자리</div>
+                <div class="cat-link">자세히 보기 →</div>
+              </div>
+              <span class="cat-thumb">🏥</span>
+            </button>
+            <button class="cat-card" type="button" data-cat="market">
+              <div class="body">
+                <div class="label">시장형사업단</div>
+                <div class="cat-desc">실버 카페, 반찬 제조 등 공동으로 물품을 만들고 판매</div>
+                <div class="cat-link">자세히 보기 →</div>
+              </div>
+              <span class="cat-thumb">🏪</span>
+            </button>
+            <button class="cat-card" type="button" data-cat="job">
+              <div class="body">
+                <div class="label">취업알선형</div>
+                <div class="cat-desc">일반 기업에 취업할 수 있도록 전문 상담가가 연계</div>
+                <div class="cat-link">자세히 보기 →</div>
+              </div>
+              <span class="cat-thumb">💼</span>
+            </button>
+          </div>
+
+          <button class="help-callout" type="button" data-goto="customercenter" style="cursor:pointer; border:none; text-align:left; width:100%;">
+            <span class="ic">ⓘ</span>
+            <span><strong>어려우신가요?</strong><br>무엇을 골라야 할지 모르겠다면 고객센터에 전화하여 상담을 받으실 수 있습니다.</span>
+          </button>
+        </div>
+
+        <!-- 5. Job list -->
+        <div class="screen" id="screen-joblist">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="categories">‹</button>
+            <h2 id="joblistTitle">공익활동형 일자리</h2>
+          </div>
+
+          <div class="info-callout">
+            <span class="ic">ⓘ</span>
+            <span>안산시 어르신들을 위한 공공 일자리입니다.<br>선택하신 유형에 해당하는 목록을 보여드려요.</span>
+          </div>
+
+          <div class="job-search">
+            <input class="text-input" id="jobSearchInput" type="text" placeholder="일자리 이름으로 찾기">
+            <button class="grid-btn" id="jobGridToggle" type="button" aria-label="보기 방식 전환">▦</button>
+          </div>
+          <p class="job-count" id="jobCount">총 3개의 일자리</p>
+          <p class="job-count" id="jobNoResult" style="display:none;">검색 결과가 없어요</p>
+
+          <button class="map-toggle-btn" id="joblistMapToggle" type="button">
+            <span class="ic">🗺️</span>
+            <span>내 위치 주변 일자리 찾아보기</span>
+          </button>
+
+          <div class="map-preview" id="joblistMapPreview">
+            <span class="map-pin" style="top:28%; left:24%;"></span>
+            <span class="map-pin-label" style="top:20%; left:8%;">안산시니어클럽</span>
+            <span class="map-pin" style="top:52%; left:58%;"></span>
+            <span class="map-pin-label" style="top:44%; left:44%;">동산노인복지관</span>
+            <span class="map-pin" style="top:74%; left:32%;"></span>
+            <span class="map-pin-label" style="top:80%; left:14%;">안산의료복지사협</span>
+          </div>
+
+          <div id="jobCardList"></div>
+        </div>
+
+        <!-- 5b. Job detail -->
+        <div class="screen" id="screen-jobdetail">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="joblist">‹</button>
+            <h2>일자리 상세 정보</h2>
+          </div>
+
+          <div class="jd-hero">
+            <div class="overlay">
+              <span class="cat-tag" id="jdCatTag">공익활동형</span>
+              <div class="jd-title" id="jdTitle">스쿨존 안전 지킴이</div>
+            </div>
+          </div>
+
+          <div class="jd-org-row">
+            <div>
+              <div class="org-name" id="jdOrgName">안산시니어클럽</div>
+              <div class="jd-status">✓ 모집중</div>
+            </div>
+            <button class="jd-contact-btn" type="button" data-goto="customercenter">📞 문의하기</button>
+          </div>
+
+          <div class="jd-info-row">
+            <span class="ic">🕐</span>
+            <div>
+              <div class="k">근무 시간</div>
+              <div class="v" id="jdTime">주 3회 (월, 수, 금)</div>
+              <div class="sub" id="jdTimeSub">오전 09:00 ~ 11:00 (일 2시간)</div>
+            </div>
+          </div>
+          <div class="jd-info-row">
+            <span class="ic">📍</span>
+            <div>
+              <div class="k">근무 장소</div>
+              <div class="v" id="jdLocation">상록구 일동 초등학교 인근</div>
+              <div class="sub" id="jdLocationSub">거주지 우선 배정 가능</div>
+            </div>
+          </div>
+          <div class="jd-info-row">
+            <span class="ic">💰</span>
+            <div>
+              <div class="k">급여 정보</div>
+              <div class="v" id="jdPay">월 290,000원</div>
+              <div class="sub" id="jdPaySub">활동비 및 부대경비 포함</div>
+            </div>
+          </div>
+          <div class="jd-info-row">
+            <span class="ic">👥</span>
+            <div>
+              <div class="k">모집 인원</div>
+              <div class="v" id="jdHeadcount">총 15명 모집</div>
+              <div class="sub" id="jdHeadcountSub">현재 8명 신청 완료</div>
+            </div>
+          </div>
+          <div class="jd-info-row">
+            <span class="ic">📅</span>
+            <div>
+              <div class="k">신청 기간</div>
+              <div class="v" id="jdPeriod">2026.08.01 ~ 08.15</div>
+              <div class="sub" id="jdPeriodSub">정원 초과 시 조기 마감될 수 있음</div>
+            </div>
+          </div>
+
+          <div class="jd-eligibility">
+            <p class="field-label" style="margin-top:0;">참여 자격 및 조건</p>
+            <ul id="jdEligibilityList">
+              <li>만 65세 이상 기초연금 수급자</li>
+              <li>안산시 거주자 (주민등록상)</li>
+              <li>신체 건강하고 활동적인 분</li>
+            </ul>
+          </div>
+
+          <button class="jd-notice" type="button">
+            <span class="ic">❗</span>
+            <span class="txt"><strong>안내사항</strong>신분증을 지참하고 방문해 주세요.</span>
+            <span class="chev">›</span>
+          </button>
+
+          <a class="btn-primary" id="jdApplyBtn" style="display:block; text-align:center; text-decoration:none;" href="https://www.ansan.go.kr/www/common/cntnts/selectContents.do?cntnts_id=C0001530" target="_blank" rel="noopener">신청하기</a>
+        </div>
+
+        <!-- 6. Apply (AI 신청 도우미) -->
+        <div class="screen" id="screen-apply">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="joblist">‹</button>
+            <h2>신청서 작성 도우미</h2>
+          </div>
+
+          <div class="apply-form" id="applyForm">
+            <div class="chat-bubble bot">스쿨존 안전 지킴이, 신청 도와드릴게요. 혼자 살고 계신가요?</div>
+            <div class="chat-bubble user">네, 혼자 살아요</div>
+            <div class="chat-bubble bot">이 활동에 참여 가능한 요일이 있으신가요?</div>
+            <div class="chat-bubble user">화, 목요일 가능해요</div>
+            <div class="apply-progress">●●●●○ 4/5 · 곧 끝나요</div>
+            <button class="btn-primary" id="applySubmitBtn" type="button" style="margin-top:auto;">제출하기</button>
+          </div>
+
+          <div class="apply-done" id="applyDone">
+            <div class="check">✓</div>
+            <p class="h-display" style="font-size:calc(19px * var(--fs-scale));">신청서가 완성됐어요</p>
+            <p class="h-sub">담당 기관(안산시니어클럽)에<br>자동으로 전달돼요.</p>
+            <button class="btn-primary" data-goto="home" type="button">홈으로</button>
+          </div>
+        </div>
+
+        <!-- 7. History -->
+        <div class="screen" id="screen-history">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="home">‹</button>
+            <h2>신청 이력 조회하기</h2>
+          </div>
+
+          <div id="historyList"></div>
+          <p class="h-sub" id="historyEmpty" style="display:none; text-align:center;">아직 신청한 일자리가 없어요.<br>일자리를 찾아 신청해보세요!</p>
+        </div>
+
+        <!-- 7b. Customer center -->
+        <div class="screen" id="screen-customercenter">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="home">‹</button>
+            <h2>고객 센터</h2>
+          </div>
+
+          <div class="cc-hero">
+            <div class="ic">💼</div>
+            <p class="t">부기부기 이용 중 궁금한 점이나<br>도움이 필요하시면 언제든 전화해 주세요.</p>
+          </div>
+
+          <a class="cc-call-btn" href="tel:1000-0000">📞 1000-0000 전화하기</a>
+          <p class="h-sub" style="text-align:center; margin:-6px 0 14px;">(예시 번호 — 실제 서비스 연동 시 안산시 노인일자리 상담 번호로 교체)</p>
+
+          <div class="card cc-hours-card">
+            <div class="row"><span class="k">평일 운영시간</span><span class="v">오전 9시 ~ 오후 6시</span></div>
+            <div class="row"><span class="k">점심시간</span><span class="v">낮 12시 ~ 오후 1시</span></div>
+            <div class="row"><span class="k">주말·공휴일</span><span class="v">운영하지 않음</span></div>
+          </div>
+        </div>
+
+        <!-- 8. Settings -->
+        <div class="screen" id="screen-settings">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="home">‹</button>
+            <h2>설정</h2>
+          </div>
+
+          <div class="settings-group">
+            <p class="g-title">화면 및 소리</p>
+            <div class="settings-list">
+              <div class="s-row">
+                <span class="ic">🔤</span>
+                <span class="label">글씨 크기</span>
+                <div class="fs-segmented" id="fsGroup">
+                  <button type="button" data-scale="1">보통</button>
+                  <button type="button" data-scale="1.15" class="on">크게</button>
+                  <button type="button" data-scale="1.3">아주 크게</button>
+                </div>
+              </div>
+              <div class="s-row">
+                <span class="ic">🔊</span>
+                <span class="label">음성 안내</span>
+                <button class="toggle on" id="voiceToggle" type="button" aria-label="음성 안내 켜기/끄기"></button>
+              </div>
+              <div class="s-row">
+                <span class="ic">🔔</span>
+                <span class="label">알림 설정</span>
+                <button class="toggle on" id="alertToggle" type="button" aria-label="알림 설정 켜기/끄기"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <p class="g-title">서비스 및 정보</p>
+            <div class="settings-list">
+              <div class="s-row" id="langRow" style="cursor:pointer;">
+                <span class="ic">🌐</span>
+                <span class="label">언어 (Language)</span>
+                <span class="value" id="langValue">한국어</span>
+                <span class="chev" style="color:var(--text-2); margin-left:4px;">›</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <p class="g-title">지원 및 보안</p>
+            <div class="settings-list">
+              <div class="s-row" data-goto="privacy" style="cursor:pointer;">
+                <span class="ic">🛡️</span>
+                <span class="label">개인정보 처리방침</span>
+                <span class="chev" style="color:var(--text-2);">›</span>
+              </div>
+              <div class="s-row" data-goto="terms" style="cursor:pointer;">
+                <span class="ic">ℹ️</span>
+                <span class="label">앱 정보 및 약관</span>
+                <span class="value">v1.2.0</span>
+                <span class="chev" style="color:var(--text-2); margin-left:4px;">›</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="settings-list" id="logoutBtn" type="button" style="width:100%; border:none; padding:13px 14px; color:#FF3B30; font-family:inherit; font-weight:600; font-size:calc(14.5px * var(--fs-scale)); cursor:pointer; text-align:center;">로그아웃</button>
+          <p class="h-sub" style="text-align:center; margin:10px 0 0;">로그아웃 시 현재 설정된 정보가 유지되지 않을 수 있습니다.</p>
+        </div>
+
+        <!-- 8b. Privacy policy -->
+        <div class="screen" id="screen-privacy">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="settings">‹</button>
+            <h2>개인정보 처리방침</h2>
+          </div>
+          <div class="doc-text">
+            <h3>1. 수집하는 개인정보 항목</h3>
+            <p>이름, 성별, 연세 — 첫 접속 시 입력하신 정보만 수집하며, 일자리 안내 문구 톤 조절 등 최소 목적으로만 사용합니다.</p>
+            <h3>2. 수집하지 않는 정보</h3>
+            <p>우선순위 판단이나 추천에 사용되는 개인 신용·소득·건강 정보는 수집하지 않습니다.</p>
+            <h3>3. 보유 및 이용 기간</h3>
+            <p>로그아웃 시 기기에 저장된 정보는 삭제될 수 있습니다.</p>
+            <h3>4. 문의</h3>
+            <p>개인정보 관련 문의는 고객센터를 통해 접수해 주세요.</p>
+          </div>
+        </div>
+
+        <!-- 8c. Terms / app info -->
+        <div class="screen" id="screen-terms">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="settings">‹</button>
+            <h2>앱 정보 및 약관</h2>
+          </div>
+          <div class="doc-text">
+            <h3>부기부기</h3>
+            <p>버전 v1.2.0 · 안산시 노인일자리 신청 접근성 지원 앱</p>
+            <h3>이용약관 요약</h3>
+            <p>이 앱은 안산시 노인일자리 신청서 작성을 돕는 서비스이며, 실제 접수는 각 수행기관 방문 접수를 통해 이루어집니다. 이 앱에서의 "제출"이 실제 접수 완료를 의미하지 않습니다.</p>
+            <h3>제공하지 않는 기능</h3>
+            <p>AI 기반 우선순위 판단·추천·매칭 기능은 제공하지 않습니다.</p>
+          </div>
+        </div>
+
+        <!-- 9. Data (공공데이터 확인하기) -->
+        <div class="screen" id="screen-data">
+          <div class="list-header">
+            <button class="back-btn" type="button" data-goto="settings">‹</button>
+            <h2>공공데이터로 본 현황</h2>
+          </div>
+
+          <div class="stat-tile-row">
+            <div class="stat-tile">
+              <span class="v">6.3%</span>
+              <span class="l">안산 노인<br>일자리 비율</span>
+            </div>
+            <div class="stat-tile">
+              <span class="v">28.7%</span>
+              <span class="l">독거노인<br>비율</span>
+            </div>
+            <div class="stat-tile">
+              <span class="v">33.6%</span>
+              <span class="l">노인 취업<br>희망률</span>
+            </div>
+          </div>
+
+          <p class="data-section-title">경기도 시군별 노인일자리 수 (2026.3)</p>
+          <div class="bar-chart">
+            <div class="bar-row">
+              <span class="b-label">고양</span>
+              <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+              <span class="b-value">9,416</span>
+            </div>
+            <div class="bar-row">
+              <span class="b-label">성남</span>
+              <div class="bar-track"><div class="bar-fill" style="width:85%;"></div></div>
+              <span class="b-value">8,022</span>
+            </div>
+            <div class="bar-row">
+              <span class="b-label">수원</span>
+              <div class="bar-track"><div class="bar-fill" style="width:79%;"></div></div>
+              <span class="b-value">7,454</span>
+            </div>
+            <div class="bar-row highlight">
+              <span class="b-label">안산</span>
+              <div class="bar-track"><div class="bar-fill" style="width:67%;"></div></div>
+              <span class="b-value">6,317</span>
+            </div>
+            <div class="bar-row">
+              <span class="b-label">시흥</span>
+              <div class="bar-track"><div class="bar-fill" style="width:64%;"></div></div>
+              <span class="b-value">6,069</span>
+            </div>
+          </div>
+
+          <p class="data-section-title">안산시 동별 독거노인 수 (상위 5)</p>
+          <table class="data-table">
+            <thead>
+              <tr><th>행정동</th><th>독거노인 수</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>초지동</td><td>1,875명</td></tr>
+              <tr><td>본오1동</td><td>1,874명</td></tr>
+              <tr><td>와동</td><td>1,793명</td></tr>
+              <tr><td>월피동</td><td>1,771명</td></tr>
+              <tr><td>사동</td><td>1,661명</td></tr>
+            </tbody>
+          </table>
+
+          <p class="data-section-title">출처</p>
+          <ul class="source-list">
+            <li>경기도 안산시_노인및독거노인 인구수 (2025.8.31 기준)</li>
+            <li>한국노인인력개발원_노인일자리현황 (2026.3 기준)</li>
+            <li>2023년도 노인실태조사 보고서 (보건복지부·한국보건사회연구원)</li>
+            <li>국민건강보험공단_건강보험 노인인구 현황 (2023.12.31)</li>
+          </ul>
+        </div>
+
+        <div class="home-indicator"></div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="note-block active" data-note="onboarding">
+        <span class="tag">MUST HAVE</span>
+        <h2>첫 접속 — 이름·성별·나이 입력</h2>
+        <p class="sub">2026.7.25 visily 목업 반영: 이름 입력 필드 추가.</p>
+        <ul>
+          <li>이름은 텍스트 입력, 성별은 세그먼트, 나이는 +/− 스테퍼 — 키보드 입력은 이름 하나로 최소화</li>
+          <li>입력 완료 시 자동으로 튜토리얼로 이동</li>
+          <li>수집 정보는 카테고리 추천이 아니라 안내 문구 톤 조절 등 최소 목적으로만 사용 — 추천 로직(WON'T HAVE)과 무관</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="tutorial">
+        <span class="tag">MUST HAVE</span>
+        <h2>튜토리얼 — 자동 시작</h2>
+        <p class="sub">첫 접속 직후 1회 자동 재생, 언제든 "건너뛰기" 가능.</p>
+        <ul>
+          <li>핵심 두 가지만 설명: 홈의 3분할 내비게이션 / 신청 시 AI 도우미</li>
+          <li>슬라이드 2~3장 이내로 짧게 — 길면 이탈</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="home">
+        <span class="tag">MUST HAVE · 2026.7.25 전면 개정</span>
+        <h2>홈 — visily 목업 구조로 전면 교체</h2>
+        <p class="sub">카카오톡으로 전달된 visily-multiscreens 목업을 새 기준으로 반영. 기존 "세로 3분할 메뉴 + 설정 안 데이터 배너" 구조를 대체함.</p>
+        <ul>
+          <li>상단: "부기부기" 타이틀 바 → 중앙 정렬 아바타 · 인사말 · 나이/성별</li>
+          <li>대형 카드 2개: 일자리 구하기(파란색 강조) / 신청 이력</li>
+          <li><strong>공공데이터 확인하기</strong> 배너를 홈에 직접 노출 — 심사기준 2번(데이터 근거) 대응, 절대 빼지 않기</li>
+          <li>"도움이 필요하신가요?" 섹션: 설정 변경 / 고객센터 2칸 카드 — 고객센터는 전화걸기 버튼과 운영시간 안내가 있는 화면으로 연결됨(전화번호는 예시)</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="categories">
+        <span class="tag">MUST HAVE</span>
+        <h2>카테고리 — "일자리 구하기"에서 진입</h2>
+        <p class="sub">보건복지부 실제 노인일자리 사업 유형 4가지를 그대로 사용했습니다.</p>
+        <ul>
+          <li>공익활동형(가장 인기 뱃지) · 사회서비스형 · 시장형사업단 · 취업알선형</li>
+          <li>각 카드에 설명 + "자세히 보기" 링크 + 썸네일 아이콘 — visily 목업 반영</li>
+          <li>하단 "어려우신가요?" 콜아웃으로 고객센터 상담 안내</li>
+          <li>카드를 누르면 해당 유형의 일자리 목록으로 이동</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="joblist">
+        <span class="tag">MUST HAVE</span>
+        <h2>일자리 목록</h2>
+        <p class="sub">선택한 카테고리(예시: 공익활동형)의 실제 모집 공고 형태.</p>
+        <ul>
+          <li>안내 문구는 "적합한 일자리를 보여드립니다" 대신 중립적 표현 사용 — 추천/우선순위 로직(WON'T HAVE)을 시사하지 않도록 의도적으로 순화</li>
+          <li>검색창은 제목·기관명 실시간 필터링 동작, 보기방식 전환 버튼은 목록/그리드 뷰 전환 동작이 실제로 작동함</li>
+          <li>카드를 누르면 <strong>일자리 상세 정보</strong> 화면으로 이동. 카드 안 "신청하기" 버튼은 클릭 전파를 막고 실제 안산시 노인일자리 페이지(ansan.go.kr)로 새 탭 연결 — 디자인·테스트 단계 한정 결정 유지</li>
+          <li><strong>"내 위치 주변 일자리 찾아보기"</strong>: 누르면 지금 목록에 있는 공고들의 위치가 지도에 핀으로 표시됨</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="jobdetail">
+        <span class="tag">MUST HAVE · 신규 화면 (2026.7.25 추가)</span>
+        <h2>일자리 상세 정보</h2>
+        <p class="sub">visily 목업 page5를 그대로 반영한 신규 화면. 기존 목업엔 없었음.</p>
+        <ul>
+          <li>근무 시간 · 장소 · 급여 · 모집 인원 · 신청 기간을 리스트로 정리</li>
+          <li>참여 자격 및 조건은 불릿 리스트로 명시</li>
+          <li>"신청하기" 버튼도 리스트 화면과 동일하게 실제 안산시 페이지로 연결 — 실제 접수는 방문 접수만 가능하다는 CLAUDE.md 결론 유지</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="apply">
+        <span class="tag">향후 빌드용 설계안 (지금은 직접 진입 경로 없음)</span>
+        <h2>AI 신청 도우미 — "이 앱에서 직접 신청 가능해?"에 대한 답</h2>
+        <p class="sub">위 탭에서만 미리 볼 수 있는 화면입니다. 지금 일자리 목록의 "신청하러 가기"는 실제 사이트로 바로 연결되고, 이 화면으로는 오지 않습니다.</p>
+        <ul>
+          <li><strong>가능한 것</strong>: 실제 앱으로 만들 때는 이 화면처럼 앱 안에서 대화형으로 신청서 내용을 작성·완성하는 것까지는 가능</li>
+          <li><strong>불가능한 것</strong>: 안산시·복지로 등 실제 공공기관 접수 시스템에 API로 직접 접수시키는 것은 불가능 — 공식 연동 계약과 인증 절차가 필요해 해커톤 범위 밖</li>
+          <li><strong>추천 방식</strong>: "제출하기"를 누르면 완성된 신청서를 실제로는 담당 수행기관(예: 안산시니어클럽)에 이메일/문서로 자동 전달하는 방식으로 확장 — 실제 빌드 단계에서 이 화면을 다시 연결하면 됨</li>
+          <li>우선순위 판단은 하지 않음(WON'T HAVE) — 접수만 대신 도와줄 뿐, 선정 여부에 관여하지 않는다는 경계를 유지</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="history">
+        <span class="tag">MUST HAVE</span>
+        <h2>신청 이력 조회하기</h2>
+        <p class="sub">홈에서 바로 진입 — 내가 신청한 내역과 현재 상태만 단순 표시.</p>
+        <ul>
+          <li>상태는 대기중/선정 등 간단한 배지(pill)로만 표시</li>
+          <li>우선순위 판단 근거 설명은 넣지 않음 — 팀 결정(WON'T HAVE) 유지</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="settings">
+        <span class="tag">SHOULD / COULD HAVE · 2026.7.25 개정</span>
+        <h2>설정</h2>
+        <p class="sub">visily 목업 반영: 화면 및 소리 / 서비스 및 정보 / 지원 및 보안 3개 그룹으로 재편.</p>
+        <ul>
+          <li>글씨 크기(보통/크게/아주 크게) — 버튼을 눌러 이 목업 전체 글씨 크기가 실제로 바뀝니다</li>
+          <li>음성 안내 · 알림 설정 on/off — SHOULD HAVE</li>
+          <li>언어 변경 — COULD HAVE</li>
+          <li><strong>공공데이터 확인하기</strong>는 설정에서 빠지고 홈 화면으로 이동함(2026.7.25 변경)</li>
+          <li>개인정보 처리방침 · 앱 정보 및 약관은 실제 텍스트 화면으로 연결됨(플레이스홀더 문구). 로그아웃은 온보딩 화면으로 돌아가는 것으로 시뮬레이션</li>
+        </ul>
+      </div>
+      <div class="note-block" data-note="data">
+        <span class="tag">심사기준 2번 — 데이터 근거</span>
+        <h2>공공데이터 확인하기 — 표·통계 화면</h2>
+        <p class="sub">단순 출처 나열이 아니라, 실제 수치를 요약 지표·막대그래프·표로 분석해서 보여줍니다.</p>
+        <ul>
+          <li>상단 3개 통계 카드: 안산 노인일자리 비율(6.3%) · 독거노인 비율(28.7%) · 노인 취업 희망률(33.6%)</li>
+          <li>막대그래프: 경기도 시군별 노인일자리 수 — 안산을 강조색으로 표시해 "경기도 내 위치"를 바로 보여줌 (중위권이라는 걸 과장 없이 그대로 시각화)</li>
+          <li>표: 안산시 동별 독거노인 수 상위 5개 — 실제 원자료(2025.8.31) 집계값</li>
+          <li>하단에 실제 사용한 공공데이터 출처 4건 명시</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- data model ----------
+  const ANSAN_APPLY_URL = 'https://www.ansan.go.kr/www/common/cntnts/selectContents.do?cntnts_id=C0001530';
+  // 취업알선형(현장실습훈련지원사업)은 노인일자리여기(seniorro.or.kr)에서 실제 온라인 접수가 가능함을
+  // 2026.7.25 확인함 — 나머지 3개 유형은 방문접수만 가능해 ansan.go.kr 유지.
+  const SENIORRO_APPLY_URL = 'https://www.seniorro.or.kr/noin/main.do';
+  const applyUrlFor = job => job.cat === 'job' ? SENIORRO_APPLY_URL : ANSAN_APPLY_URL;
+
+  const CATEGORIES = {
+    publicgood: { label: '공익활동형', tag: '공익활동형' },
+    social: { label: '사회서비스형', tag: '사회서비스형' },
+    market: { label: '시장형사업단', tag: '시장형사업단' },
+    job: { label: '취업알선형', tag: '취업알선형' },
+  };
+
+  const JOBS = [
+    { id: 'j1', cat: 'publicgood', org: '안산시니어클럽', title: '스쿨존 안전 지킴이',
+      schedule: '주 3회 · 오전 9시~11시', headcountShort: '모집 3명', location: '원곡동 일대',
+      time: '주 3회 (월, 수, 금)', timeSub: '오전 09:00 ~ 11:00 (일 2시간)',
+      locationFull: '상록구 일동 초등학교 인근', locationSub: '거주지 우선 배정 가능',
+      pay: '월 290,000원', paySub: '활동비 및 부대경비 포함',
+      headcount: '총 15명 모집', headcountSub: '현재 8명 신청 완료',
+      period: '2026.08.01 ~ 08.15', periodSub: '정원 초과 시 조기 마감될 수 있음',
+      eligibility: ['만 65세 이상 기초연금 수급자', '안산시 거주자 (주민등록상)', '신체 건강하고 활동적인 분'] },
+    { id: 'j2', cat: 'publicgood', org: '동산노인복지관', title: '경로당 행정 도우미',
+      schedule: '주 5회 · 오전 10시~오후 2시', headcountShort: '모집 2명', location: '성포동 경로당',
+      time: '주 5회 (월~금)', timeSub: '오전 10:00 ~ 오후 2:00 (일 4시간)',
+      locationFull: '성포동 경로당', locationSub: '대중교통 이용 권장',
+      pay: '월 350,000원', paySub: '활동비 및 부대경비 포함',
+      headcount: '총 2명 모집', headcountSub: '현재 1명 신청 완료',
+      period: '2026.08.01 ~ 08.20', periodSub: '정원 초과 시 조기 마감될 수 있음',
+      eligibility: ['만 65세 이상 기초연금 수급자', '안산시 거주자 (주민등록상)', '기본적인 문서 작성이 가능한 분'] },
+    { id: 'j3', cat: 'publicgood', org: '안산의료복지사회적협동조합', title: '공공도서관 봉사',
+      schedule: '주 2회 · 오후 1시~4시', headcountShort: '모집 4명', location: '상록수도서관',
+      time: '주 2회 (화, 목)', timeSub: '오후 01:00 ~ 04:00 (일 3시간)',
+      locationFull: '상록수도서관', locationSub: '도서관 내 안내데스크 인근',
+      pay: '월 220,000원', paySub: '활동비 포함',
+      headcount: '총 4명 모집', headcountSub: '현재 2명 신청 완료',
+      period: '2026.08.05 ~ 08.20', periodSub: '정원 초과 시 조기 마감될 수 있음',
+      eligibility: ['만 65세 이상 기초연금 수급자', '안산시 거주자 (주민등록상)', '신체 건강하고 활동적인 분'] },
+    { id: 'j4', cat: 'social', org: '안산장애인복지관', title: '장애인 이동 지원 도우미',
+      schedule: '주 3회 · 오전 9시~12시', headcountShort: '모집 3명', location: '단원구 일대',
+      time: '주 3회 (월, 수, 금)', timeSub: '오전 09:00 ~ 12:00 (일 3시간)',
+      locationFull: '단원구 일대 자택-복지관 이동 구간', locationSub: '차량 탑승 보조 위주',
+      pay: '월 310,000원', paySub: '활동비 및 교통비 포함',
+      headcount: '총 3명 모집', headcountSub: '현재 1명 신청 완료',
+      period: '2026.08.01 ~ 08.18', periodSub: '정원 초과 시 조기 마감될 수 있음',
+      eligibility: ['만 65세 이상 기초연금 수급자', '안산시 거주자 (주민등록상)', '보행 및 부축 활동이 가능한 분'] },
+    { id: 'j5', cat: 'social', org: '상록수노인복지센터', title: '재가 어르신 말벗 도우미',
+      schedule: '주 2회 · 오후 2시~4시', headcountShort: '모집 5명', location: '상록구 일대',
+      time: '주 2회 (화, 금)', timeSub: '오후 02:00 ~ 04:00 (일 2시간)',
+      locationFull: '상록구 재가 어르신 가정 방문', locationSub: '2인 1조 방문 활동',
+      pay: '월 250,000원', paySub: '활동비 포함',
+      headcount: '총 5명 모집', headcountSub: '현재 3명 신청 완료',
+      period: '2026.08.01 ~ 08.25', periodSub: '정원 초과 시 조기 마감될 수 있음',
+      eligibility: ['만 65세 이상 기초연금 수급자', '안산시 거주자 (주민등록상)', '원활한 의사소통이 가능한 분'] },
+    { id: 'j6', cat: 'market', org: '실버카페 다감', title: '카페 바리스타 보조',
+      schedule: '주 4회 · 오전 9시~1시', headcountShort: '모집 4명', location: '단원구 고잔동',
+      time: '주 4회 (월~목)', timeSub: '오전 09:00 ~ 오후 01:00 (일 4시간)',
+      locationFull: '단원구 고잔동 실버카페 다감', locationSub: '매장 내 근무',
+      pay: '월 480,000원', paySub: '매출 연동 수당 별도',
+      headcount: '총 4명 모집', headcountSub: '현재 2명 신청 완료',
+      period: '2026.08.01 ~ 08.15', periodSub: '정원 초과 시 조기 마감될 수 있음',
+      eligibility: ['만 65세 이상 기초연금 수급자', '안산시 거주자 (주민등록상)', '서서 하는 근무가 가능한 분'] },
+    { id: 'j7', cat: 'market', org: '손맛 반찬사업단', title: '반찬 제조·포장원',
+      schedule: '주 5회 · 오전 8시~12시', headcountShort: '모집 6명', location: '초지동 공동작업장',
+      time: '주 5회 (월~금)', timeSub: '오전 08:00 ~ 12:00 (일 4시간)',
+      locationFull: '초지동 공동작업장', locationSub: '위생복 지급',
+      pay: '월 500,000원', paySub: '매출 연동 수당 별도',
+      headcount: '총 6명 모집', headcountSub: '현재 4명 신청 완료',
+      period: '2026.08.01 ~ 08.10', periodSub: '정원 초과 시 조기 마감될 수 있음',
+      eligibility: ['만 65세 이상 기초연금 수급자', '안산시 거주자 (주민등록상)', '장시간 서서 작업 가능한 분'] },
+    { id: 'j8', cat: 'job', org: '안산시니어클럽 취업지원센터', title: '재취업 상담 연계',
+      schedule: '주 1회 상담 · 개별 일정', headcountShort: '모집 상시', location: '안산시니어클럽 본관',
+      time: '주 1회 개별 상담', timeSub: '예약제 (전화 사전 예약 필요)',
+      locationFull: '안산시니어클럽 본관 2층', locationSub: '방문 상담 원칙',
+      pay: '상담 무료', paySub: '연계 취업처 급여는 개별 협의',
+      headcount: '상시 모집', headcountSub: '선착순 상담 예약',
+      period: '상시', periodSub: '예약 후 방문',
+      eligibility: ['만 60세 이상', '안산시 거주자 (주민등록상)', '재취업 의사가 있는 분'] },
+  ];
+
+  // ---------- persisted state ----------
+  const STORAGE_KEY = 'boogiboogieState';
+  const defaultState = {
+    onboarded: false,
+    profile: { name: '', gender: '여성', age: 70, avatarSet: false },
+    settings: { fontScale: '1.15', voice: true, alerts: true, langIdx: 0 },
+    applications: [],
+  };
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return JSON.parse(JSON.stringify(defaultState));
+      const parsed = JSON.parse(raw);
+      return {
+        ...JSON.parse(JSON.stringify(defaultState)),
+        ...parsed,
+        profile: { ...defaultState.profile, ...(parsed.profile || {}) },
+        settings: { ...defaultState.settings, ...(parsed.settings || {}) },
+        applications: Array.isArray(parsed.applications) ? parsed.applications : [],
+      };
+    } catch (e) {
+      return JSON.parse(JSON.stringify(defaultState));
+    }
+  }
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE));
+  }
+
+  let STATE = loadState();
+  let currentCategory = 'publicgood';
+  let currentJobId = 'j1';
+
+  // ---------- navigation ----------
+  const screens = document.querySelectorAll('.screen');
+  const notes = document.querySelectorAll('.note-block');
+  const tabs = document.querySelectorAll('.switcher [role="tab"]');
+  const phone = document.getElementById('phone');
+
+  function goTo(name) {
+    screens.forEach(s => s.classList.toggle('active', s.id === 'screen-' + name));
+    notes.forEach(n => n.classList.toggle('active', n.dataset.note === name));
+    tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.target === name ? 'true' : 'false'));
+    if (name === 'apply') {
+      document.getElementById('applyForm').style.display = 'flex';
+      document.getElementById('applyDone').classList.remove('active');
+    }
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => goTo(t.dataset.target)));
+
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => goTo(el.dataset.goto));
+  });
+
+  // ---------- profile / home ----------
+  function renderProfile() {
+    document.getElementById('homeName').textContent = STATE.profile.name || '이용자';
+    document.getElementById('homeMeta').textContent = `${STATE.profile.age}세 · ${STATE.profile.gender === '남성' ? '남' : '여'}`;
+    document.getElementById('avatarBtn').classList.toggle('set', STATE.profile.avatarSet);
+    document.getElementById('avatarEmoji').textContent = STATE.profile.avatarSet ? '🙂' : '👤';
+  }
+
+  document.getElementById('avatarBtn').addEventListener('click', function () {
+    STATE.profile.avatarSet = !STATE.profile.avatarSet;
+    saveState();
+    renderProfile();
+  });
+
+  // ---------- job list / detail ----------
+  function updateJobCount(explicitCount) {
+    const total = explicitCount !== undefined ? explicitCount : document.querySelectorAll('#jobCardList .job-card').length;
+    document.getElementById('jobCount').textContent = `총 ${total}개의 일자리`;
+    document.getElementById('jobCount').style.display = total ? '' : 'none';
+    document.getElementById('jobNoResult').style.display = total ? 'none' : '';
+  }
+
+  function renderCategoryJobs(catId) {
+    currentCategory = catId;
+    const cat = CATEGORIES[catId] || CATEGORIES.publicgood;
+    document.getElementById('joblistTitle').textContent = cat.label + ' 일자리';
+    const list = JOBS.filter(j => j.cat === catId);
+    const container = document.getElementById('jobCardList');
+    container.innerHTML = list.map(j => `
+      <div class="card job-card" data-job-id="${j.id}">
+        <div class="org">${j.org}</div>
+        <div class="title">${j.title}</div>
+        <div class="meta">📅 ${j.schedule}<br>👥 ${j.headcountShort} · 📍 ${j.location}</div>
+        <a class="apply" data-apply-job="${j.id}" href="${applyUrlFor(j)}" target="_blank" rel="noopener">신청하기 →</a>
+      </div>
+    `).join('');
+    container.querySelectorAll('.job-card').forEach(card => {
+      card.addEventListener('click', () => {
+        renderJobDetail(card.dataset.jobId);
+        goTo('jobdetail');
+      });
+    });
+    container.querySelectorAll('[data-apply-job]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.stopPropagation();
+        recordApplication(a.dataset.applyJob);
+      });
+    });
+    document.getElementById('jobSearchInput').value = '';
+    document.getElementById('jobGridToggle').classList.remove('on');
+    container.classList.remove('grid-view');
+    updateJobCount(list.length);
+  }
+
+  function renderJobDetail(jobId) {
+    const job = JOBS.find(j => j.id === jobId) || JOBS[0];
+    currentJobId = job.id;
+    document.getElementById('jdCatTag').textContent = CATEGORIES[job.cat].tag;
+    document.getElementById('jdTitle').textContent = job.title;
+    document.getElementById('jdOrgName').textContent = job.org;
+    document.getElementById('jdTime').textContent = job.time;
+    document.getElementById('jdTimeSub').textContent = job.timeSub;
+    document.getElementById('jdLocation').textContent = job.locationFull;
+    document.getElementById('jdLocationSub').textContent = job.locationSub;
+    document.getElementById('jdPay').textContent = job.pay;
+    document.getElementById('jdPaySub').textContent = job.paySub;
+    document.getElementById('jdHeadcount').textContent = job.headcount;
+    document.getElementById('jdHeadcountSub').textContent = job.headcountSub;
+    document.getElementById('jdPeriod').textContent = job.period;
+    document.getElementById('jdPeriodSub').textContent = job.periodSub;
+    document.getElementById('jdEligibilityList').innerHTML = job.eligibility.map(e => `<li>${e}</li>`).join('');
+    document.getElementById('jdApplyBtn').href = applyUrlFor(job);
+  }
+
+  document.querySelectorAll('.cat-card').forEach(card => {
+    card.addEventListener('click', () => {
+      renderCategoryJobs(card.dataset.cat);
+      goTo('joblist');
+    });
+  });
+
+  document.getElementById('jdApplyBtn').addEventListener('click', () => recordApplication(currentJobId));
+
+  document.getElementById('jobGridToggle').addEventListener('click', function () {
+    this.classList.toggle('on');
+    document.getElementById('jobCardList').classList.toggle('grid-view', this.classList.contains('on'));
+  });
+
+  document.getElementById('jobSearchInput').addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    const cards = Array.from(document.querySelectorAll('#jobCardList .job-card'));
+    let shown = 0;
+    cards.forEach(card => {
+      const text = (card.querySelector('.title').textContent + card.querySelector('.org').textContent).toLowerCase();
+      const match = text.includes(q);
+      card.style.display = match ? '' : 'none';
+      if (match) shown++;
+    });
+    updateJobCount(shown);
+  });
+
+  document.getElementById('joblistMapToggle').addEventListener('click', function () {
+    this.classList.toggle('on');
+    document.getElementById('joblistMapPreview').classList.toggle('on', this.classList.contains('on'));
+  });
+
+  // ---------- applications / history ----------
+  function recordApplication(jobId) {
+    const job = JOBS.find(j => j.id === jobId);
+    if (!job || STATE.applications.some(a => a.jobId === jobId)) return;
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}.${today.getMonth() + 1}.${today.getDate()}`;
+    STATE.applications.unshift({ jobId, title: job.title, org: job.org, status: '대기중', date: dateStr });
+    saveState();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('historyList');
+    const empty = document.getElementById('historyEmpty');
+    if (!STATE.applications.length) {
+      list.innerHTML = '';
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+    list.innerHTML = STATE.applications.map(a => `
+      <div class="card history-card">
+        <div class="top-row">
+          <span class="title">${a.title}</span>
+          <span class="status-pill ${a.status === '선정' ? 'selected' : 'wait'}">${a.status}</span>
+        </div>
+        <div class="meta">${a.org} · ${a.date} 신청</div>
+      </div>
+    `).join('');
+  }
+
+  // ---------- AI 신청 도우미 preview (미연결 프리뷰 화면, 기존 그대로) ----------
+  document.getElementById('applySubmitBtn').addEventListener('click', () => {
+    document.getElementById('applyForm').style.display = 'none';
+    document.getElementById('applyDone').classList.add('active');
+  });
+
+  // ---------- onboarding ----------
+  const nameInput = document.getElementById('nameInput');
+  const onboardNextBtn = document.getElementById('onboardNextBtn');
+
+  nameInput.addEventListener('input', () => {
+    onboardNextBtn.disabled = !nameInput.value.trim();
+  });
+
+  document.querySelectorAll('#screen-onboarding .segmented button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+    });
+  });
+
+  onboardNextBtn.addEventListener('click', () => {
+    if (!nameInput.value.trim()) return;
+    const genderBtn = document.querySelector('#screen-onboarding .segmented button.on');
+    STATE.profile.name = nameInput.value.trim();
+    STATE.profile.gender = genderBtn ? genderBtn.textContent.trim() : '여성';
+    STATE.profile.age = age;
+    saveState();
+    renderProfile();
+    goTo('tutorial');
+  });
+
+  function completeOnboarding() {
+    STATE.onboarded = true;
+    saveState();
+    goTo('home');
+  }
+  document.getElementById('tutSkipBtn').addEventListener('click', completeOnboarding);
+  document.getElementById('tutNextBtn').addEventListener('click', completeOnboarding);
+
+  let age = STATE.profile.age;
+  const ageEl = document.querySelector('.age-value');
+  ageEl.textContent = age;
+  nameInput.value = STATE.profile.name;
+  onboardNextBtn.disabled = !STATE.profile.name;
+  document.querySelectorAll('#screen-onboarding .segmented button').forEach(b => {
+    b.classList.toggle('on', b.textContent.trim() === STATE.profile.gender);
+  });
+  document.querySelectorAll('.stepper button').forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      age += i === 0 ? -1 : 1;
+      age = Math.max(60, Math.min(100, age));
+      ageEl.textContent = age;
+    });
+  });
+
+  // ---------- settings ----------
+  const langs = ['한국어', 'English', '中文', 'Tiếng Việt'];
+  let langIdx = STATE.settings.langIdx || 0;
+
+  document.getElementById('langRow').addEventListener('click', () => {
+    langIdx = (langIdx + 1) % langs.length;
+    document.getElementById('langValue').textContent = langs[langIdx];
+    STATE.settings.langIdx = langIdx;
+    saveState();
+  });
+
+  document.querySelectorAll('#fsGroup button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#fsGroup button').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      phone.style.setProperty('--fs-scale', btn.dataset.scale);
+      STATE.settings.fontScale = btn.dataset.scale;
+      saveState();
+    });
+  });
+
+  document.getElementById('voiceToggle').addEventListener('click', function () {
+    this.classList.toggle('on');
+    STATE.settings.voice = this.classList.contains('on');
+    saveState();
+  });
+  document.getElementById('alertToggle').addEventListener('click', function () {
+    this.classList.toggle('on');
+    STATE.settings.alerts = this.classList.contains('on');
+    saveState();
+  });
+
+  function applySettingsToUI() {
+    phone.style.setProperty('--fs-scale', STATE.settings.fontScale);
+    document.querySelectorAll('#fsGroup button').forEach(b => b.classList.toggle('on', b.dataset.scale === STATE.settings.fontScale));
+    document.getElementById('voiceToggle').classList.toggle('on', STATE.settings.voice);
+    document.getElementById('alertToggle').classList.toggle('on', STATE.settings.alerts);
+    document.getElementById('langValue').textContent = langs[langIdx] || langs[0];
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    STATE = JSON.parse(JSON.stringify(defaultState));
+    age = STATE.profile.age;
+    ageEl.textContent = age;
+    nameInput.value = '';
+    onboardNextBtn.disabled = true;
+    document.querySelectorAll('#screen-onboarding .segmented button').forEach(b => {
+      b.classList.toggle('on', b.textContent.trim() === STATE.profile.gender);
+    });
+    langIdx = STATE.settings.langIdx;
+    applySettingsToUI();
+    renderProfile();
+    renderHistory();
+    goTo('onboarding');
+  });
+
+  // ---------- init ----------
+  applySettingsToUI();
+  renderProfile();
+  renderHistory();
+  renderCategoryJobs(currentCategory);
+  renderJobDetail(currentJobId);
+  goTo(STATE.onboarded ? 'home' : 'onboarding');
+</script>

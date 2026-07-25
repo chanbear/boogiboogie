@@ -195,6 +195,12 @@ function rowToJob(row) {
   };
 }
 
+// 발표 중 실제 배포 DB에 뭐가 쌓이는지 팀이 직접 확인할 용도의 임시 관리자 조회.
+// 서버 콘솔 접근이 안 되는 무료 Render 플랜이라 이 방법으로 대체함(2026.7.25).
+function getAllProfiles() {
+  return db.prepare('SELECT device_id, name, gender, age, onboarded FROM profile ORDER BY device_id').all();
+}
+
 function ensureDevice(deviceId) {
   db.prepare('INSERT OR IGNORE INTO profile (device_id) VALUES (?)').run(deviceId);
   db.prepare('INSERT OR IGNORE INTO settings (device_id) VALUES (?)').run(deviceId);
@@ -304,6 +310,6 @@ module.exports = {
   getSettings, updateSettings,
   getCategories, getJobsByCategory, getJob,
   getApplications, createApplication,
-  getDataMeta,
+  getDataMeta, getAllProfiles,
   resetAll,
 };

@@ -107,6 +107,37 @@ app.post('/api/logout', (req, res) => {
   res.json(db.resetAll(req.deviceId));
 });
 
+// 팀이 실제 배포 DB에 뭐가 쌓이는지 확인할 용도의 임시 조회 화면.
+// 무료 Render 플랜은 셸 접속이 안 돼서 이 방법으로 대체함(2026.7.25) — 발표 끝나면 지울 것.
+const ADMIN_KEY = process.env.ADMIN_KEY || '292cbe32089444dfee704988';
+app.get('/admin/profiles', (req, res) => {
+  if (req.query.key !== ADMIN_KEY) return res.status(403).send('forbidden');
+  const rows = db.getAllProfiles();
+  const rowsHtml = rows.map(r => `
+    <tr>
+      <td>${r.name || '<i>(빈 값)</i>'}</td>
+      <td>${r.gender}</td>
+      <td>${r.age}</td>
+      <td>${r.onboarded ? '✅' : '—'}</td>
+      <td style="color:#888; font-size:12px;">${r.device_id}</td>
+    </tr>`).join('');
+  res.send(`
+    <!doctype html><html><head><meta charset="utf-8">
+    <title>노인 일자리 알리미 — 실제 접속자 데이터</title>
+    <style>
+      body { font-family: -apple-system, sans-serif; padding: 24px; background: #F5F5F7; }
+      h1 { font-size: 18px; }
+      table { border-collapse: collapse; width: 100%; background: #fff; border-radius: 12px; overflow: hidden; }
+      th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid #eee; font-size: 14px; }
+      th { background: #F2F2F7; }
+    </style></head><body>
+    <h1>실제 배포 DB — 프로필 (${rows.length}건)</h1>
+    <table><thead><tr><th>이름</th><th>성별</th><th>나이</th><th>온보딩 완료</th><th>기기 ID</th></tr></thead>
+    <tbody>${rowsHtml}</tbody></table>
+    </body></html>
+  `);
+});
+
 app.listen(PORT, () => {
   console.log(`노인 일자리 알리미 서버 실행 중: http://localhost:${PORT}`);
 });

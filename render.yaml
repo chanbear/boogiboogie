@@ -8,4 +8,4 @@ services:
     plan: free
     envVars:
       - key: NODE_VERSION
-        value: 22.5.0
+        value: 22.11.0

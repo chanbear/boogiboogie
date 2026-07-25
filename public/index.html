@@ -238,6 +238,23 @@
     text-align: center; font-weight: 700; color: var(--accent);
     font-size: calc(13.5px * var(--fs-scale)); margin: 0 0 6px;
   }
+  .tut-extsite {
+    background: #fff; color: #1D1D1F; border-radius: 16px; overflow: hidden;
+    border: 1px solid #D2D2D7; text-align: left;
+  }
+  .tut-extsite .bar {
+    background: #F2F2F7; padding: 7px 10px; font-size: 10.5px; color: #6E6E73;
+    border-bottom: 1px solid #D2D2D7;
+  }
+  .tut-extsite .body { padding: 14px; }
+  .tut-extsite h4 { margin: 0 0 10px; font-size: 13.5px; }
+  .tut-extsite .f-row { margin-bottom: 8px; }
+  .tut-extsite .f-row .k { font-size: 10.5px; color: #6E6E73; margin-bottom: 2px; }
+  .tut-extsite .f-row .v { border: 1px solid #D2D2D7; border-radius: 6px; padding: 6px 8px; font-size: 11.5px; }
+  .tut-extsite .submit {
+    display: block; width: 100%; text-align: center; margin-top: 10px;
+    background: #007AFF; color: #fff; border-radius: 8px; padding: 8px; font-size: 12.5px; font-weight: 700;
+  }
   .dots { display: flex; justify-content: center; gap: 6px; margin: 18px 0; }
   .dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--divider); }
   .dots span.on { background: var(--accent); width: 18px; border-radius: 4px; }
@@ -657,7 +674,7 @@
             <p class="h-sub" id="tutSub">아래는 실제 화면과 똑같아요. 강조된 부분을 확인해보세요.</p>
             <div class="tut-mockup" id="tutMockup"></div>
             <p class="tut-tap-caption" id="tutTapCaption"></p>
-            <div class="dots" id="tutDots"><span class="on"></span><span></span><span></span></div>
+            <div class="dots" id="tutDots"><span class="on"></span><span></span><span></span><span></span></div>
           </div>
           <button class="btn-primary" id="tutNextBtn" type="button">다음</button>
         </div>
@@ -1520,6 +1537,20 @@
           <span class="apply tut-target" style="display:block; text-align:center;">신청하기 →</span>
         </div>`,
     },
+    {
+      titleKey: 'tut.step4.title', subKey: 'tut.step4.sub', captionKey: 'tut.step4.caption',
+      mockup: `
+        <div class="tut-extsite tut-target">
+          <div class="bar">🔒 seniorro.or.kr — 노인일자리여기</div>
+          <div class="body">
+            <h4>재취업 상담 연계 · 온라인 접수</h4>
+            <div class="f-row"><div class="k">이름</div><div class="v">&nbsp;</div></div>
+            <div class="f-row"><div class="k">성별 / 생년월일</div><div class="v">&nbsp;</div></div>
+            <div class="f-row"><div class="k">연락처</div><div class="v">&nbsp;</div></div>
+            <span class="submit">접수하기</span>
+          </div>
+        </div>`,
+    },
   ];
   let tutStep = 0;
 
@@ -1626,6 +1657,9 @@
     'tut.step3.title': ['일자리 목록에서<br>버튼을 눌러보세요', 'Tap the button<br>in the job list', '在工作列表中<br>点击按钮', 'Nhấn vào nút<br>trong danh sách việc làm'],
     'tut.step3.sub': ['이 버튼을 누르면 실제로 신청할 수 있는 홈페이지로 이동해요.', 'This button takes you to the real application website.', '此按钮将带您前往真实的申请网站。', 'Nút này đưa bạn đến trang web ứng tuyển thực tế.'],
     'tut.step3.caption': ['👆 이 버튼을 누르면 신청 홈페이지로 이동해요', '👆 Tap this button to go to the application website', '👆 点击此按钮前往申请网站', '👆 Nhấn nút này để đến trang web ứng tuyển'],
+    'tut.step4.title': ['취업알선형은<br>진짜 온라인 접수가 가능해요', 'Job Placement listings<br>support real online applications', '就业介绍型<br>支持真正的在线申请', 'Loại giới thiệu việc làm<br>hỗ trợ ứng tuyển trực tuyến thật'],
+    'tut.step4.sub': ['노인일자리여기(seniorro.or.kr)라는 정부 사이트로 연결돼서, 이름·성별·생년월일·연락처만 입력하면 접수가 끝나요.', "You'll be taken to the government site 노인일자리여기(seniorro.or.kr) — just enter your name, gender, birth date, and phone number to finish.", '会跳转到政府网站"노인일자리여기"(seniorro.or.kr)，只需填写姓名、性别、出生日期和联系方式即可完成申请。', 'Bạn sẽ được chuyển đến trang chính phủ 노인일자리여기(seniorro.or.kr) — chỉ cần nhập tên, giới tính, ngày sinh và số điện thoại là xong.'],
+    'tut.step4.caption': ['👆 이렇게 실제 신청 화면이 나와요', '👆 This is the real application screen', '👆 这就是真实的申请页面', '👆 Đây là màn hình ứng tuyển thực tế'],
   };
 
   function t(key) {

@@ -210,11 +210,15 @@
   .coach-layer {
     position: absolute; inset: 0; z-index: 50; display: none; pointer-events: none;
   }
-  .coach-layer.on { display: block; }
+  .coach-layer.on { display: block; pointer-events: auto; }
   .coach-ring {
     position: absolute; border-radius: 18px;
     box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 0 3px var(--accent);
     animation: coachPulse 1.4s ease-in-out infinite;
+  }
+  .coach-hit {
+    position: absolute; border-radius: 18px; background: transparent;
+    pointer-events: auto; cursor: pointer;
   }
   @keyframes coachPulse {
     0%, 100% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 0 3px var(--accent); }
@@ -1045,6 +1049,7 @@
 
         <div class="coach-layer" id="coachLayer">
           <div class="coach-ring" id="coachRing"></div>
+          <div class="coach-hit" id="coachHit"></div>
           <div class="coach-tip" id="coachTip"></div>
           <button class="coach-skip" id="coachSkipBtn" type="button" data-i18n="common.skip">건너뛰기</button>
         </div>
@@ -1113,21 +1118,9 @@
     screens.forEach(s => s.classList.toggle('active', s.id === 'screen-' + name));
     speakScreen(name);
     if (name === 'data') loadDataMeta();
-    if (coachIndex >= 0) {
-      const current = COACH_SEQUENCE[coachIndex];
-      const next = COACH_SEQUENCE[coachIndex + 1];
-      if (current && current.screen === name) {
-        renderCoachStep();
-      } else if (next && next.screen === name) {
-        coachIndex += 1;
-        renderCoachStep();
-      } else {
-        endCoachTour();
-      }
-    }
   }
 
-  // ---------- coach-mark tour (실제 화면 위에 강조 표시, 2026.7.25 미니어처 방식 대체) ----------
+  // ---------- coach-mark tour (실제 화면 위에 강조 표시만 하고, 탭해도 실제 기능은 동작하지 않음) ----------
   const COACH_SEQUENCE = [
     { screen: 'home', selector: '.home-card.primary', key: 'coach.step1' },
     { screen: 'categories', selector: '.cat-card[data-cat="publicgood"]', key: 'coach.step2' },
@@ -1143,7 +1136,7 @@
   function renderCoachStep(attemptsLeft) {
     const step = COACH_SEQUENCE[coachIndex];
     if (!step) { endCoachTour(); return; }
-    if (attemptsLeft === undefined) attemptsLeft = 20; // 카테고리 클릭 시 목록이 비동기로 로드돼서 재시도 필요
+    if (attemptsLeft === undefined) attemptsLeft = 20; // 목록이 비동기로 채워지는 경우 대비해 재시도
     requestAnimationFrame(() => {
       const el = document.querySelector(step.selector);
       if (el) { positionCoach(el, t(step.key)); return; }
@@ -1156,13 +1149,16 @@
     const phoneRect = phone.getBoundingClientRect();
     const tr = target.getBoundingClientRect();
     const pad = 6;
-    const ring = document.getElementById('coachRing');
-    const tip = document.getElementById('coachTip');
-    ring.style.left = (tr.left - phoneRect.left - pad) + 'px';
-    ring.style.top = (tr.top - phoneRect.top - pad) + 'px';
-    ring.style.width = (tr.width + pad * 2) + 'px';
-    ring.style.height = (tr.height + pad * 2) + 'px';
+    const box = { left: tr.left - phoneRect.left - pad, top: tr.top - phoneRect.top - pad, width: tr.width + pad * 2, height: tr.height + pad * 2 };
+    ['coachRing', 'coachHit'].forEach(id => {
+      const el = document.getElementById(id);
+      el.style.left = box.left + 'px';
+      el.style.top = box.top + 'px';
+      el.style.width = box.width + 'px';
+      el.style.height = box.height + 'px';
+    });
 
+    const tip = document.getElementById('coachTip');
     tip.textContent = '👆 ' + text;
     const bottomInPhone = tr.bottom - phoneRect.top;
     if (phoneRect.height - bottomInPhone > 90) {
@@ -1173,11 +1169,19 @@
 
     document.getElementById('coachLayer').classList.add('on');
     speak(text);
-
-    if (coachIndex === COACH_SEQUENCE.length - 1) {
-      target.addEventListener('click', () => setTimeout(endCoachTour, 300), { once: true });
-    }
   }
+
+  // 강조된 자리를 탭해도 실제 화면 전환/신청 등 진짜 기능은 실행하지 않고, 안내만 다음 단계로 넘김
+  function advanceCoach() {
+    const next = COACH_SEQUENCE[coachIndex + 1];
+    if (!next) { endCoachTour(); return; }
+    coachIndex += 1;
+    screens.forEach(s => s.classList.toggle('active', s.id === 'screen-' + next.screen));
+    if (next.screen === 'joblist') renderCategoryJobs('publicgood');
+    renderCoachStep();
+  }
+
+  document.getElementById('coachHit').addEventListener('click', advanceCoach);
 
   function endCoachTour() {
     coachIndex = -1;
@@ -1302,6 +1306,9 @@
     L.control.attribution({ prefix: false }).addTo(leafletMap);
     drawJobMarkers();
     locateUser();
+    // 컨테이너가 display:none → block으로 바뀐 직후라 Leaflet이 크기를 잘못 잡는 경우가 있어
+    // 첫 오픈 때도 한 번 더 크기를 재계산해줘야 지도가 빈 화면으로 보이지 않음
+    setTimeout(() => { leafletMap.invalidateSize(); drawJobMarkers(); }, 80);
   }
 
   function locateUser() {

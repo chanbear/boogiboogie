@@ -1212,6 +1212,7 @@
   function endCoachTour() {
     coachIndex = -1;
     document.getElementById('coachLayer').classList.remove('on');
+    goTo('home');
   }
 
   document.getElementById('coachSkipBtn').addEventListener('click', endCoachTour);

@@ -2,7 +2,7 @@
   "name": "boogiboogie-server",
   "version": "1.0.0",
   "private": true,
-  "description": "부기부기 백엔드 — Express + SQLite (해커톤 데모용, 단일 사용자)",
+  "description": "노인 일자리 알리미 백엔드 — Express + SQLite (해커톤 데모용, 단일 사용자)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

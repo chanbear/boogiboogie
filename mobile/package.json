@@ -2,7 +2,7 @@
   "name": "ilja-alrimi-mobile",
   "version": "1.0.0",
   "private": true,
-  "description": "일자리 알리미 — Capacitor 안드로이드 앱 래퍼 (부기부기 오프라인 버전)",
+  "description": "노인 일자리 알리미 — Capacitor 안드로이드 앱 래퍼 (오프라인 버전)",
   "scripts": {
     "icons": "node generate-icons.js"
   },

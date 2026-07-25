@@ -796,14 +796,7 @@
             <span>내 위치 주변 일자리 찾아보기</span>
           </button>
 
-          <div class="map-preview" id="joblistMapPreview">
-            <span class="map-pin" style="top:28%; left:24%;"></span>
-            <span class="map-pin-label" style="top:20%; left:8%;">안산시니어클럽</span>
-            <span class="map-pin" style="top:52%; left:58%;"></span>
-            <span class="map-pin-label" style="top:44%; left:44%;">동산노인복지관</span>
-            <span class="map-pin" style="top:74%; left:32%;"></span>
-            <span class="map-pin-label" style="top:80%; left:14%;">안산의료복지사협</span>
-          </div>
+          <div class="map-preview" id="joblistMapPreview"></div>
 
           <div id="jobCardList"></div>
         </div>
@@ -1143,12 +1136,34 @@
   const screens = document.querySelectorAll('.screen');
   const phone = document.getElementById('phone');
 
+  function speak(text) {
+    if (!text || !STATE || !STATE.settings || !STATE.settings.voice) return;
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ko-KR';
+    window.speechSynthesis.speak(utter);
+  }
+
+  function speakScreen(name) {
+    const screenEl = document.getElementById('screen-' + name);
+    if (!screenEl) return;
+    if (name === 'home') {
+      const nameEl = document.getElementById('homeName');
+      speak(nameEl ? `안녕하세요, ${nameEl.textContent}님. 홈 화면입니다` : '홈 화면입니다');
+      return;
+    }
+    const h2 = screenEl.querySelector('h2');
+    speak(h2 ? h2.textContent + ' 화면입니다' : null);
+  }
+
   function goTo(name) {
     screens.forEach(s => s.classList.toggle('active', s.id === 'screen-' + name));
     if (name === 'apply') {
       document.getElementById('applyForm').style.display = 'flex';
       document.getElementById('applyDone').classList.remove('active');
     }
+    speakScreen(name);
   }
 
   document.querySelectorAll('[data-goto]').forEach(el => {
@@ -1177,11 +1192,33 @@
     document.getElementById('jobNoResult').style.display = total ? 'none' : '';
   }
 
+  const MAP_PIN_SLOTS = [
+    { pin: { top: '28%', left: '24%' }, label: { top: '20%', left: '8%' } },
+    { pin: { top: '52%', left: '58%' }, label: { top: '44%', left: '44%' } },
+    { pin: { top: '74%', left: '32%' }, label: { top: '80%', left: '14%' } },
+    { pin: { top: '20%', left: '76%' }, label: { top: '10%', left: '58%' } },
+  ];
+
+  function renderMapPins(list) {
+    const preview = document.getElementById('joblistMapPreview');
+    const orgs = [...new Set(list.map(j => j.org))].slice(0, MAP_PIN_SLOTS.length);
+    if (!orgs.length) {
+      preview.innerHTML = '<span class="map-pin-label" style="top:44%; left:28%;">주변에 일자리가 없어요</span>';
+      return;
+    }
+    preview.innerHTML = orgs.map((org, i) => {
+      const slot = MAP_PIN_SLOTS[i];
+      return `<span class="map-pin" style="top:${slot.pin.top}; left:${slot.pin.left};"></span>
+        <span class="map-pin-label" style="top:${slot.label.top}; left:${slot.label.left};">${org}</span>`;
+    }).join('');
+  }
+
   async function renderCategoryJobs(catId) {
     currentCategory = catId;
     const cat = CATEGORIES[catId] || CATEGORIES.publicgood;
     document.getElementById('joblistTitle').textContent = cat.label + ' 일자리';
     const list = await api('/jobs?category=' + encodeURIComponent(catId));
+    renderMapPins(list);
     const container = document.getElementById('jobCardList');
     container.innerHTML = list.map(j => `
       <div class="card job-card" data-job-id="${j.id}">
@@ -1364,6 +1401,8 @@
   document.getElementById('voiceToggle').addEventListener('click', async function () {
     this.classList.toggle('on');
     STATE.settings = await api('/settings', { method: 'PUT', body: JSON.stringify({ voice: this.classList.contains('on') }) });
+    if (STATE.settings.voice) speak('음성 안내를 켰습니다');
+    else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   });
   document.getElementById('alertToggle').addEventListener('click', async function () {
     this.classList.toggle('on');

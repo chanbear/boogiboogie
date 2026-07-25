@@ -174,9 +174,9 @@ const backfillCoordStmt = db.prepare('UPDATE jobs SET lat = @lat, lng = @lng WHE
 JOBS.forEach(j => backfillCoordStmt.run({ id: j.id, lat: j.lat, lng: j.lng }));
 
 const ANSAN_APPLY_URL = 'https://www.ansan.go.kr/www/common/cntnts/selectContents.do?cntnts_id=C0001530';
-// 취업알선형(현장실습훈련지원사업)은 노인일자리여기(seniorro.or.kr)에서 실제 온라인 접수가 가능함을
-// 2026.7.25 확인함 — 나머지 3개 유형(공익활동형/사회서비스형/시장형사업단)은 방문접수만 가능해 ansan.go.kr 유지.
-const SENIORRO_APPLY_URL = 'https://www.seniorro.or.kr/noin/main.do';
+// 취업알선형(현장실습훈련지원사업)은 노인일자리여기(seniorro.or.kr)에서 실제 온라인 접수가 가능하다는 걸
+// 확인했었으나(2026.7.25), 앱이 실제 정부 접수 시스템에 데이터를 대신 넣는 것처럼 보이는 걸 피하기 위해
+// 팀 결정으로 연동하지 않기로 함(2026.7.25) — 4개 유형 모두 안내 페이지로만 연결.
 
 function rowToJob(row) {
   return {
@@ -189,10 +189,9 @@ function rowToJob(row) {
     period: row.period, periodSub: row.period_sub,
     eligibility: JSON.parse(row.eligibility),
     lat: row.lat, lng: row.lng,
-    applyUrl: row.cat === 'job' ? SENIORRO_APPLY_URL : ANSAN_APPLY_URL,
-    // 취업알선형(job)만 seniorro.or.kr에서 실제 온라인 접수가 가능함. 나머지 3개 유형은
-    // 안산시 안내 페이지로 연결될 뿐 실제 접수는 수행기관 방문으로만 완료됨(2026.7.25 재검증).
-    visitRequired: row.cat !== 'job',
+    applyUrl: ANSAN_APPLY_URL,
+    // 4개 유형 전부 안산시 안내 페이지로 연결될 뿐, 실제 접수는 수행기관 방문으로만 완료됨(2026.7.25).
+    visitRequired: true,
   };
 }
 
